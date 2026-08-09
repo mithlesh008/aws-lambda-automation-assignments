@@ -231,30 +231,4 @@ No third-party Python package is required for the source code. Lambda provides B
 
 ## Recommended order
 
-Complete Assignment 2 before Assignment 5 because Assignment 5 can reuse an EBS snapshot created by Assignment 2. Complete Assignment 4 and Assignment 6 only a few times because they use paid or security-sensitive services.
-
-## Set a $1 budget alert first
-
-In the AWS Console:
-
-1. Open **Billing and Cost Management → Budgets → Create budget**.
-2. Choose **Cost budget**.
-3. Set amount to **1 USD**, monthly period, and an email notification at **80%** and **100%**.
-4. Confirm the email notification if AWS requests it.
-5. Capture the budget page only if your assessor asks for setup evidence; do not include billing account details in a public repository.
-
-## Common Lambda deployment pattern
-
-Each assignment README contains exact commands. The common pattern is:
-
-```bash
-zip function.zip lambda_function.py
-aws lambda create-function \
-  --function-name FUNCTION_NAME \
-  --runtime python3.12 \
-  --handler lambda_function.lambda_handler \
-  --role ROLE_ARN \
-  --zip-file fileb://function.zip
-```
-
-For the Lambda console, use **Author from scratch**, runtime **Python 3.12**, handler `lambda_function.lambda_handler`, and the assignment execution role. In **Configuration → Environment variables**, enter the variables shown in that assignment README.
+Complete Assignment 2 before Assignment 5 because Assignment 5 can reuse an EBS snapshot created by Assignment 2 otherwise need to create separate temporary snapshot for testing.
