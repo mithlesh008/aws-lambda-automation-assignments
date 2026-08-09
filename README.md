@@ -1,7 +1,5 @@
 # AWS Lambda Automation Assignments
 
-> **Start here:** Follow [`ONE-DOCUMENT-LAB-GUIDE.md`](ONE-DOCUMENT-LAB-GUIDE.md) from beginning to end.
-
 This repository contains six Python 3.12 AWS Lambda assignments. Each assignment has its own Lambda source, IAM policies, test event, and `README.md` with setup, testing, screenshots, and cleanup instructions.
 
 ## Repository layout
@@ -260,71 +258,3 @@ aws lambda create-function \
 ```
 
 For the Lambda console, use **Author from scratch**, runtime **Python 3.12**, handler `lambda_function.lambda_handler`, and the assignment execution role. In **Configuration → Environment variables**, enter the variables shown in that assignment README.
-
-## Evidence and screenshot naming
-
-Save screenshots outside the repository or in a private `evidence/` folder that is not pushed if it contains account IDs, email addresses, private IPs, or sensitive policy data. Recommended names:
-
-```text
-01-iam-role.png
-02-lambda-configuration.png
-03-test-invocation-output.png
-04-cloudwatch-logs.png
-05-final-result.png
-```
-
-Each assignment README identifies the exact point at which to capture these screenshots. The minimum evidence set for every completed assignment is:
-
-* IAM role trust relationship and inline policy
-* Lambda runtime, handler, role, and environment variables
-* Test invocation result
-* CloudWatch log stream showing affected resource IDs
-* Final AWS console or CLI result proving the objective
-
-Do not publish access keys, secret keys, SNS email addresses, private IP addresses, customer data, or unrestricted public bucket policies.
-
-## GitHub commands
-
-Create an empty private or public GitHub repository, then run from this directory:
-
-```bash
-cd aws-lambda-automation-assignments
-git init
-git add .
-git commit -m "Add AWS Lambda automation assignments"
-git branch -M main
-git remote add origin https://github.com/YOUR_GITHUB_USER/aws-lambda-automation-assignments.git
-git push -u origin main
-```
-
-Submit the GitHub URL plus the six README files or the four README files selected for grading. Do not commit `function.zip`, `response.json`, screenshots containing sensitive information, AWS credentials, or `.env` files.
-
-Suggested `.gitignore`:
-
-```gitignore
-*.zip
-response*.json
-*.log
-.env
-.venv/
-__pycache__/
-evidence-private/
-```
-
-## Final cleanup checklist
-
-Run this before logging out:
-
-* Terminate every test EC2 instance and wait for `terminated`.
-* Delete test EBS snapshots and deregister test AMIs after terminating instances.
-* Delete test S3 objects and buckets if they are no longer needed.
-* Delete unused SNS topics and confirm there are no active subscriptions you do not need.
-* Delete Lambda functions, EventBridge rules/Scheduler schedules, test log groups, and inline IAM roles.
-* Release unused Elastic IP addresses.
-* Check **Billing → Bills** and **EC2 → Elastic Block Store → Snapshots** for leftovers.
-
-## Assignment discussion points
-
-* S3 Lifecycle is preferable for simple age-based expiration; use Lambda when deletion depends on conditional business logic, naming patterns, cross-service actions, or notifications.
-* Data Lifecycle Manager is preferable for standard EBS snapshot retention; use Lambda for custom retention, cross-account copies, notifications, or additional workflow logic.
-* AWS Budgets is preferable for managed spending thresholds; use Lambda for custom per-service breakdowns, Slack/Teams delivery, or anomaly logic.
