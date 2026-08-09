@@ -17,7 +17,11 @@ export ROLE_ARN=$(aws iam get-role --role-name Ec2AutoTagLambdaRole --query Role
 
 Console: **IAM → Roles → Create role → Lambda**. Add `inline-policy.json` as an inline policy named `Ec2AutoTagPolicy`.
 
-[Screenshot 1: capture the IAM role trust relationship and inline policy.]
+<img width="895" height="519" alt="01" src="https://github.com/user-attachments/assets/b5d54b47-265b-4182-93ec-efb93bee922d" />
+
+<img width="1611" height="554" alt="02" src="https://github.com/user-attachments/assets/9d699903-e640-4322-b983-fd27fe35dbd1" />
+
+<img width="1611" height="632" alt="03" src="https://github.com/user-attachments/assets/9a85f753-5b74-47f2-9ae9-c168429b764d" />
 
 ## 2. Create Lambda
 
@@ -35,7 +39,8 @@ aws lambda create-function \
 
 Console: create Python 3.12 function, upload the ZIP, confirm handler, and add `TAG_KEY=Environment` and `TAG_VALUE=Training`.
 
-[Screenshot 2: capture Lambda configuration.]
+<img width="1611" height="408" alt="04" src="https://github.com/user-attachments/assets/6ad94930-7596-4ce6-a4be-e07597e99995" />
+
 
 ## 3. Create the EventBridge event pattern
 
@@ -56,7 +61,8 @@ aws lambda add-permission --function-name ec2-auto-tag --statement-id allow-ec2-
 
 Console path: **Amazon EventBridge → Rules → Create rule → Event pattern → Custom pattern**. Paste `pattern.json`, select the Lambda target, and create the rule.
 
-[Screenshot 3: capture the rule event pattern, enabled state, and Lambda target.]
+<img width="1688" height="486" alt="05" src="https://github.com/user-attachments/assets/0f59332e-1c46-4700-9391-42cf60a388f3" />
+
 
 ## 4. Test with a disposable t3.micro
 
@@ -74,7 +80,8 @@ aws ec2 describe-tags --filters Name=resource-id,Values="$INSTANCE_ID" --output 
 
 The event may take a short time to arrive. EventBridge events are best-effort and the Lambda tagging operation is idempotent for the same tag keys.
 
-[Screenshot 4: capture `LaunchDate` and `Environment=Training` on the instance.]
+<img width="924" height="224" alt="06" src="https://github.com/user-attachments/assets/968b1876-bbe2-422d-b80e-d38b50fc65ea" />
+
 
 ## 5. Test invocation and logs
 
@@ -87,13 +94,9 @@ cat response.json
 aws logs tail /aws/lambda/ec2-auto-tag --since 10m
 ```
 
-[Screenshot 5: capture the test output.]
+<img width="888" height="447" alt="07" src="https://github.com/user-attachments/assets/85f57e65-ac02-4436-baa7-8cbb847fe476" />
 
-[Screenshot 6: capture CloudWatch logs showing the instance ID and tags.]
-
-## Optional bonus: CloudTrail owner tag
-
-The EC2 state-change event does not contain the launching IAM principal. A bonus implementation can add `cloudtrail:LookupEvents`, search for `RunInstances` shortly before the state event, match the instance ID, and set an `Owner` tag to `userIdentity.arn`. This is eventual and can be ambiguous for Auto Scaling, assumed roles, or service launches; document the limitation.
+<img width="1716" height="348" alt="08" src="https://github.com/user-attachments/assets/664408f5-45fd-4e3f-8f49-74f28ca8075c" />
 
 ## Cleanup
 
