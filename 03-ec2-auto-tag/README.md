@@ -111,7 +111,3 @@ aws iam delete-role-policy --role-name Ec2AutoTagLambdaRole --policy-name Ec2Aut
 aws iam delete-role --role-name Ec2AutoTagLambdaRole
 rm -f function.zip pattern.json response.json
 ```
-
-## Final result screenshot
-
-[Screenshot 7: capture the final EC2 instance tags and the Lambda log result before cleanup.]
