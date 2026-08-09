@@ -1,0 +1,1 @@
+{"id":"manual-test","source":"aws.ec2","detail-type":"EC2 Instance State-change Notification","detail":{"instance-id":"REPLACE_WITH_INSTANCE_ID","state":"running"}}
