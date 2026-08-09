@@ -22,7 +22,8 @@ aws s3 cp /tmp/new.txt "s3://$BUCKET/${PREFIX}new.txt"
 aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX" --query 'Contents[].{Key:Key,LastModified:LastModified}' --output table
 ```
 
-[Screenshot 1: capture the initial S3 object listing before Lambda runs.]
+<img width="881" height="260" alt="02" src="https://github.com/user-attachments/assets/ac6693ff-b82e-4587-829a-7897298e4aaa" />
+
 
 ## 2. Create the IAM role
 
@@ -36,7 +37,9 @@ aws iam put-role-policy --role-name S3CleanupLambdaRole --policy-name S3CleanupP
 export ROLE_ARN=$(aws iam get-role --role-name S3CleanupLambdaRole --query Role.Arn --output text)
 ```
 
-[Screenshot 2: capture the role trust relationship and inline policy.]
+<img width="1621" height="635" alt="03" src="https://github.com/user-attachments/assets/b1cd0737-8441-470c-9227-6d86e1e320e4" />
+<img width="1621" height="569" alt="04" src="https://github.com/user-attachments/assets/ce3a5006-8084-4f60-afeb-f56ebdc5d735" />
+
 
 ## 3. Create and configure Lambda
 
@@ -56,7 +59,8 @@ aws lambda create-function \
 
 Console path: **Lambda → Create function → Author from scratch → Python 3.12 → Change default execution role → Use existing role → choose `S3CleanupLambdaRole` → Create function**. Upload `function.zip` under **Code → Upload from → .zip file**. Under **Runtime settings**, confirm handler `lambda_function.lambda_handler`. Under **Configuration → Environment variables**, add `BUCKET`, `PREFIX`, and `AGE_SECONDS=60`.
 
-[Screenshot 3: capture runtime Python 3.12, handler, execution role, and environment variables.]
+<img width="1095" height="346" alt="05" src="https://github.com/user-attachments/assets/e712e570-c11a-4b3d-9d7a-48612cabf453" />
+
 
 ## 4. Test invocation
 
@@ -65,13 +69,22 @@ In the Lambda console select **Test**, create an event with `{}`, and invoke. Or
 ```bash
 echo '{}' > test-event.json
 aws lambda invoke --function-name s3-old-object-cleaner --payload fileb://test-event.json --cli-binary-format raw-in-base64-out response.json
+```
+
+<img width="783" height="106" alt="06" src="https://github.com/user-attachments/assets/3cdc3db1-7159-49c1-aeb5-3ef711476fe7" />
+
+```bash
 cat response.json
+```
+
+<img width="831" height="315" alt="09" src="https://github.com/user-attachments/assets/d31b7a89-42fa-4c55-b698-8912964688ce" />
+
+```bash
 aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX" --query 'Contents[].Key' --output table
 ```
 
-Only `new.txt` should remain. The function uses the paginator and batches deletes in groups of at most 1,000 objects.
+**Observation**: Only `new.txt` should remain. The function uses the paginator and batches deletes in groups of objects.
 
-[Screenshot 4: capture the Lambda test result showing `deleted_count` and deleted key names.]
 
 ## 5. CloudWatch logs
 
@@ -79,7 +92,8 @@ Only `new.txt` should remain. The function uses the paginator and batches delete
 aws logs tail /aws/lambda/s3-old-object-cleaner --since 10m
 ```
 
-[Screenshot 5: capture logs showing the bucket, cutoff, scanned count, and deleted object IDs/names.]
+<img width="1703" height="244" alt="08" src="https://github.com/user-attachments/assets/bc5765ae-fcc3-42ab-8401-da8480322b07" />
+
 
 ## 6. Restore the production setting
 
@@ -88,6 +102,9 @@ aws lambda update-function-configuration \
   --function-name s3-old-object-cleaner \
   --environment "Variables={BUCKET=$BUCKET,PREFIX=$PREFIX,AGE_SECONDS=2592000}"
 ```
+
+<img width="1007" height="227" alt="07" src="https://github.com/user-attachments/assets/44787ad4-d469-4815-8fbf-24bafb1c66c4" />
+
 
 Do this before enabling any schedule. For new automation, EventBridge Scheduler is preferred. If the assignment requires a scheduled EventBridge rule:
 
@@ -98,11 +115,7 @@ aws events put-targets --rule s3-old-object-cleaner-daily --targets Id=cleanup,A
 aws lambda add-permission --function-name s3-old-object-cleaner --statement-id allow-eventbridge-cleanup --action lambda:InvokeFunction --principal events.amazonaws.com --source-arn "$RULE_ARN"
 ```
 
-[Screenshot 6: capture the enabled EventBridge rule, rate expression, and Lambda target if scheduling is demonstrated.]
-
 ## 7. Final result and cleanup
-
-[Screenshot 7: capture the final S3 listing proving only newer objects remain.]
 
 ```bash
 aws s3 rm "s3://$BUCKET/$PREFIX" --recursive
