@@ -1,6 +1,6 @@
 # AWS Lambda Automation Assignments
 
-This repository contains six Python 3.12 AWS Lambda assignments. Each assignment has its own Lambda source, IAM policies, test event, and `README.md` with setup, testing, screenshots, and cleanup instructions.
+This repository contains 4 Python 3.12 AWS Lambda assignments. Each assignment has its own Lambda source, IAM policies, test event, and `README.md` with setup, testing, screenshots, and cleanup instructions.
 
 ## Repository layout
 
@@ -15,9 +15,7 @@ aws-lambda-automation-assignments/
 │   └── test-event.json
 ├── 02-ebs-snapshot/
 ├── 03-ec2-auto-tag/
-├── 04-cost-alert/
 ├── 05-ec2-restore/
-└── 06-s3-public-audit/
 ```
 
 ## Prerequisites
