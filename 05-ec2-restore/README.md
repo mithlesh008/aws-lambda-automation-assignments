@@ -21,7 +21,8 @@ export KEY_NAME=your-key-pair
 
 The snapshot, Lambda, AMI, subnet, and instance must be in the same Region. `t3.micro` requires an x86_64 HVM-compatible AMI.
 
-[Screenshot 1: capture the selected completed source snapshot and volume ID.]
+<img width="971" height="317" alt="Screenshot 2026-08-09 at 7 58 23 PM" src="https://github.com/user-attachments/assets/c561fbaf-ca0b-49b7-96cb-bc860d158996" />
+
 
 ## 1. Create the IAM role
 
@@ -33,7 +34,7 @@ export ROLE_ARN=$(aws iam get-role --role-name Ec2RestoreLambdaRole --query Role
 
 Console: create a Lambda role and add the JSON as an inline policy. `Describe*` APIs generally require `Resource=*`; creation/tagging permissions should be tightened further in production using resource and request-tag conditions.
 
-[Screenshot 2: capture trust relationship and inline policy.]
+<img width="902" height="489" alt="Screenshot 2026-08-09 at 8 03 19 PM" src="https://github.com/user-attachments/assets/461d4357-1bec-4199-bc23-398c607985df" />
 
 ## 2. Create Lambda
 
@@ -54,7 +55,8 @@ The code waits for the AMI to become available before launching the instance. Th
 
 Console: configure Python 3.12, handler, role, and all environment variables.
 
-[Screenshot 3: capture Lambda configuration.]
+<img width="980" height="567" alt="Screenshot 2026-08-09 at 8 25 43 PM" src="https://github.com/user-attachments/assets/8fcc6910-f993-4bd4-9e56-33ad15f5cda8" />
+
 
 ## 3. Invoke and verify
 
@@ -73,11 +75,11 @@ aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
 aws ec2 describe-instances --instance-ids "$INSTANCE_ID" --query 'Reservations[0].Instances[0].{State:State.Name,Type:InstanceType,Image:ImageId,Root:RootDeviceName,Tags:Tags,Volumes:BlockDeviceMappings}' --output table
 ```
 
-[Screenshot 4: capture test invocation output with snapshot, AMI, and instance IDs.]
+<img width="864" height="828" alt="Screenshot 2026-08-09 at 8 29 19 PM" src="https://github.com/user-attachments/assets/c2c7552c-2ada-46c2-bc35-d4bdb85a1d74" />
+<img width="827" height="248" alt="Screenshot 2026-08-09 at 8 28 05 PM" src="https://github.com/user-attachments/assets/10aba5d4-c8ce-4c5a-836e-e2d408a30e42" />
+<img width="1726" height="523" alt="Screenshot 2026-08-09 at 8 32 44 PM" src="https://github.com/user-attachments/assets/a48aa109-39c3-498d-a5c7-c09e6657a6fb" />
 
-[Screenshot 5: capture AMI details showing the root block-device mapping to the snapshot.]
 
-[Screenshot 6: capture the running restored `t3.micro` and `RestoredFrom` tag.]
 
 ## 4. CloudWatch logs
 
@@ -85,7 +87,8 @@ aws ec2 describe-instances --instance-ids "$INSTANCE_ID" --query 'Reservations[0
 aws logs tail /aws/lambda/ec2-restore-from-snapshot --since 20m
 ```
 
-[Screenshot 7: capture logs showing the registered AMI and launched instance IDs.]
+<img width="1709" height="203" alt="Screenshot 2026-08-09 at 8 31 45 PM" src="https://github.com/user-attachments/assets/1652b0ad-56db-4c37-98e4-280269fcf720" />
+
 
 ## 5. Cleanup immediately
 
@@ -102,7 +105,3 @@ rm -f function.zip response.json
 ```
 
 If the restored root volume is not set to delete on termination, delete it after the instance is terminated. Delete only disposable snapshots after confirming they are not referenced by other AMIs.
-
-## Final result screenshot
-
-[Screenshot 8: capture the final AMI and instance details before cleanup, then record the cleanup commands in the README submission notes.]
